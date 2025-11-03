@@ -1,0 +1,1 @@
+# vetcore_notifications_msvc
