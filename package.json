@@ -1,0 +1,23 @@
+{
+  "name": "vetcore_notifications_msvc",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon index.js",
+    "start": "node index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "amqplib": "^0.10.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "nodemailer": "^6.9.8"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}

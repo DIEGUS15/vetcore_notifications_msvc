@@ -1,0 +1,66 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: vetcore_rabbitmq_email_dev
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: vetcore
+      RABBITMQ_DEFAULT_PASS: vetcore_pass
+    volumes:
+      - rabbitmq_email_data_dev:/var/lib/rabbitmq
+    networks:
+      - email-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  email-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vetcore_email_msvc
+    restart: always
+    ports:
+      - "3002:3002"
+    environment:
+      PORT: 3002
+      RABBITMQ_URL: amqp://vetcore_vetcore_pass@rabbitmq:5672
+      NODE_ENV: development
+      SMTP_HOST: smtp.gmail.com
+      SMTP_PORT: 587
+      SMTP_SECURE: false
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      EMAIL_FROM: ${EMAIL_FROM}
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - email-network
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:3003/health",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  email-network:
+    driver: bridge
+
+volumes:
+  rabbitmq_email_data_dev:
+    driver: local
