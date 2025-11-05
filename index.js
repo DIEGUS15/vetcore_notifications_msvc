@@ -4,6 +4,7 @@ import { connectRabbitMQ, closeConnection } from "./src/config/rabbitmq.js";
 import { verifyEmailConfig } from "./src/config/mailer.js";
 import { startClientCreatedConsumer } from "./src/events/consumers/clientCreatedConsumer.js";
 import { startUserCreatedByAdminConsumer } from "./src/events/consumers/userCreatedByAdminConsumer.js";
+import { startAppointmentCreatedConsumer } from "./src/events/consumers/appointmentCreatedConsumer.js";
 
 dotenv.config();
 
@@ -29,6 +30,7 @@ const startServer = async () => {
 
     await startClientCreatedConsumer();
     await startUserCreatedByAdminConsumer();
+    await startAppointmentCreatedConsumer();
 
     app.listen(PORT, () => {
       console.log(`Email Service running on http://localhost:${PORT}`);

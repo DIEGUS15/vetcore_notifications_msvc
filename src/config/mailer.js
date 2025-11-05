@@ -236,3 +236,140 @@ Este correo fue enviado automáticamente. Por favor no respondas a este mensaje.
     throw error;
   }
 };
+
+export const sendAppointmentConfirmationEmail = async (to, recipientName, appointmentData, recipientType) => {
+  try {
+    const isClient = recipientType === "client";
+    const { fecha, hora, motivo, petName, clientName, veterinarianName } = appointmentData;
+
+    const mailOptions = {
+      from: `"Vetcore Platform" <${process.env.EMAIL_FROM}>`,
+      to: to,
+      subject: isClient ? "Confirmación de cita en Vetcore" : "Nueva cita asignada - Vetcore",
+      html: `
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>${isClient ? 'Confirmación de cita' : 'Nueva cita asignada'}</title>
+        </head>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="background-color: ${isClient ? '#4CAF50' : '#FF9800'}; padding: 20px; text-align: center; border-radius: 10px 10px 0 0;">
+            <h1 style="color: white; margin: 0;">${isClient ? '¡Cita confirmada!' : 'Nueva cita asignada'}</h1>
+          </div>
+
+          <div style="background-color: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
+            <h2 style="color: ${isClient ? '#4CAF50' : '#FF9800'};">Hola ${recipientName},</h2>
+
+            <p>${isClient
+              ? `Tu cita ha sido <strong>agendada exitosamente</strong> en Vetcore.`
+              : `Se te ha asignado una <strong>nueva cita</strong> para atender.`
+            }</p>
+
+            <h3 style="color: ${isClient ? '#4CAF50' : '#FF9800'}; margin-top: 30px;">Detalles de la cita:</h3>
+
+            <div style="background-color: #fff; padding: 20px; border-radius: 5px; margin: 20px 0; border-left: 4px solid ${isClient ? '#4CAF50' : '#FF9800'};">
+              <p style="margin: 8px 0;"><strong>📅 Fecha:</strong> ${fecha}</p>
+              <p style="margin: 8px 0;"><strong>🕒 Hora:</strong> ${hora}</p>
+              <p style="margin: 8px 0;"><strong>🐾 Mascota:</strong> ${petName}</p>
+              <p style="margin: 8px 0;"><strong>${isClient ? '👨‍⚕️ Veterinario' : '👤 Cliente'}:</strong> ${isClient ? veterinarianName : clientName}</p>
+              <p style="margin: 8px 0;"><strong>📋 Motivo:</strong> ${motivo}</p>
+            </div>
+
+            ${isClient
+              ? `
+              <div style="background-color: #e8f5e9; border-left: 4px solid #4CAF50; padding: 15px; margin: 20px 0;">
+                <p style="margin: 0; font-weight: bold; color: #2e7d32;">✅ Recordatorios importantes:</p>
+                <ul style="margin: 10px 0 0 0; padding-left: 20px; color: #2e7d32;">
+                  <li>Llega 10 minutos antes de tu cita</li>
+                  <li>Trae el carnet de vacunación de tu mascota</li>
+                  <li>Si necesitas cancelar, hazlo con al menos 24 horas de anticipación</li>
+                </ul>
+              </div>
+              `
+              : `
+              <div style="background-color: #fff3e0; border-left: 4px solid #FF9800; padding: 15px; margin: 20px 0;">
+                <p style="margin: 0; font-weight: bold; color: #e65100;">📌 Información adicional:</p>
+                <ul style="margin: 10px 0 0 0; padding-left: 20px; color: #e65100;">
+                  <li>Revisa el historial médico de la mascota antes de la cita</li>
+                  <li>Prepara el consultorio con anticipación</li>
+                  <li>Confirma que cuentas con el equipo necesario</li>
+                </ul>
+              </div>
+              `
+            }
+
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}"
+                 style="background-color: ${isClient ? '#4CAF50' : '#FF9800'}; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">
+                Ver en Vetcore
+              </a>
+            </div>
+
+            <p>Si tienes alguna pregunta o necesitas hacer cambios, no dudes en contactarnos.</p>
+
+            <p style="margin-top: 30px;">
+              <strong>El equipo de Vetcore</strong><br>
+              <small style="color: #666;">Cuidando de tus mascotas con amor y profesionalismo</small>
+            </p>
+          </div>
+
+          <div style="text-align: center; margin-top: 20px; color: #666; font-size: 12px;">
+            <p>Este correo fue enviado automáticamente. Por favor no respondas a este mensaje.</p>
+          </div>
+        </body>
+        </html>
+      `,
+      text: `
+${isClient ? '¡Cita confirmada!' : 'Nueva cita asignada'}
+
+Hola ${recipientName},
+
+${isClient
+  ? 'Tu cita ha sido agendada exitosamente en Vetcore.'
+  : 'Se te ha asignado una nueva cita para atender.'
+}
+
+DETALLES DE LA CITA:
+- Fecha: ${fecha}
+- Hora: ${hora}
+- Mascota: ${petName}
+- ${isClient ? 'Veterinario' : 'Cliente'}: ${isClient ? veterinarianName : clientName}
+- Motivo: ${motivo}
+
+${isClient
+  ? `
+RECORDATORIOS IMPORTANTES:
+- Llega 10 minutos antes de tu cita
+- Trae el carnet de vacunación de tu mascota
+- Si necesitas cancelar, hazlo con al menos 24 horas de anticipación
+  `
+  : `
+INFORMACIÓN ADICIONAL:
+- Revisa el historial médico de la mascota antes de la cita
+- Prepara el consultorio con anticipación
+- Confirma que cuentas con el equipo necesario
+  `
+}
+
+Visita: ${process.env.FRONTEND_URL || 'http://localhost:5173'}
+
+Si tienes alguna pregunta o necesitas hacer cambios, no dudes en contactarnos.
+
+El equipo de Vetcore
+Cuidando de tus mascotas con amor y profesionalismo
+
+---
+Este correo fue enviado automáticamente. Por favor no respondas a este mensaje.
+      `,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`Appointment confirmation email sent to ${to} (${recipientType}). Message ID: ${info.messageId}`);
+    return info;
+  } catch (error) {
+    console.error(`Error sending appointment confirmation email to ${to}:`, error.message);
+    throw error;
+  }
+};
