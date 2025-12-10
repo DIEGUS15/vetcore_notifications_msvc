@@ -373,3 +373,291 @@ Este correo fue enviado automáticamente. Por favor no respondas a este mensaje.
     throw error;
   }
 };
+
+export const sendAppointmentReminderEmail = async (to, clientName, appointmentData) => {
+  try {
+    const { date, time, reason, petName } = appointmentData;
+
+    const mailOptions = {
+      from: `"Vetcore Platform" <${process.env.EMAIL_FROM}>`,
+      to: to,
+      subject: "Recordatorio: Tu cita es mañana - Vetcore",
+      html: `
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Recordatorio de cita</title>
+        </head>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="background-color: #FF9800; padding: 20px; text-align: center; border-radius: 10px 10px 0 0;">
+            <h1 style="color: white; margin: 0;">⏰ Recordatorio de Cita</h1>
+          </div>
+
+          <div style="background-color: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
+            <h2 style="color: #FF9800;">Hola ${clientName},</h2>
+
+            <p>Te recordamos que tienes una <strong>cita programada mañana</strong> en Vetcore.</p>
+
+            <div style="background-color: #fff; padding: 20px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #FF9800;">
+              <p style="margin: 8px 0;"><strong>📅 Fecha:</strong> ${date}</p>
+              <p style="margin: 8px 0;"><strong>🕒 Hora:</strong> ${time}</p>
+              <p style="margin: 8px 0;"><strong>🐾 Mascota:</strong> ${petName}</p>
+              <p style="margin: 8px 0;"><strong>📋 Motivo:</strong> ${reason}</p>
+            </div>
+
+            <div style="background-color: #fff3e0; border-left: 4px solid #FF9800; padding: 15px; margin: 20px 0;">
+              <p style="margin: 0; font-weight: bold; color: #e65100;">📌 Recordatorios importantes:</p>
+              <ul style="margin: 10px 0 0 0; padding-left: 20px; color: #e65100;">
+                <li>Llega 10 minutos antes de tu cita</li>
+                <li>Trae el carnet de vacunación de tu mascota</li>
+                <li>Si necesitas cancelar, hazlo con anticipación</li>
+              </ul>
+            </div>
+
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}"
+                 style="background-color: #FF9800; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">
+                Ver mis citas
+              </a>
+            </div>
+
+            <p>¡Nos vemos mañana!</p>
+
+            <p style="margin-top: 30px;">
+              <strong>El equipo de Vetcore</strong><br>
+              <small style="color: #666;">Cuidando de tus mascotas con amor y profesionalismo</small>
+            </p>
+          </div>
+
+          <div style="text-align: center; margin-top: 20px; color: #666; font-size: 12px;">
+            <p>Este correo fue enviado automáticamente. Por favor no respondas a este mensaje.</p>
+          </div>
+        </body>
+        </html>
+      `,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`Appointment reminder email sent to ${to}. Message ID: ${info.messageId}`);
+    return info;
+  } catch (error) {
+    console.error(`Error sending appointment reminder email to ${to}:`, error.message);
+    throw error;
+  }
+};
+
+export const sendVaccinationReminderEmail = async (to, clientName, vaccinationData) => {
+  try {
+    const { vaccineName, nextDose, petName } = vaccinationData;
+
+    const mailOptions = {
+      from: `"Vetcore Platform" <${process.env.EMAIL_FROM}>`,
+      to: to,
+      subject: "Recordatorio: Vacuna próxima a vencer - Vetcore",
+      html: `
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Recordatorio de vacunación</title>
+        </head>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="background-color: #2196F3; padding: 20px; text-align: center; border-radius: 10px 10px 0 0;">
+            <h1 style="color: white; margin: 0;">💉 Recordatorio de Vacunación</h1>
+          </div>
+
+          <div style="background-color: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
+            <h2 style="color: #2196F3;">Hola ${clientName},</h2>
+
+            <p>Te recordamos que la siguiente dosis de vacuna de <strong>${petName}</strong> está próxima a vencer.</p>
+
+            <div style="background-color: #fff; padding: 20px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #2196F3;">
+              <p style="margin: 8px 0;"><strong>💉 Vacuna:</strong> ${vaccineName}</p>
+              <p style="margin: 8px 0;"><strong>📅 Próxima dosis:</strong> ${nextDose}</p>
+              <p style="margin: 8px 0;"><strong>🐾 Mascota:</strong> ${petName}</p>
+            </div>
+
+            <div style="background-color: #e3f2fd; border-left: 4px solid #2196F3; padding: 15px; margin: 20px 0;">
+              <p style="margin: 0; font-weight: bold; color: #1565c0;">⚠️ Importante:</p>
+              <p style="margin: 10px 0 0 0; color: #1565c0;">
+                Mantener al día las vacunas de tu mascota es esencial para su salud y bienestar. Te recomendamos agendar una cita cuanto antes.
+              </p>
+            </div>
+
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}"
+                 style="background-color: #2196F3; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">
+                Agendar cita
+              </a>
+            </div>
+
+            <p>Si ya agendaste la cita, puedes ignorar este mensaje.</p>
+
+            <p style="margin-top: 30px;">
+              <strong>El equipo de Vetcore</strong><br>
+              <small style="color: #666;">Cuidando de tus mascotas con amor y profesionalismo</small>
+            </p>
+          </div>
+
+          <div style="text-align: center; margin-top: 20px; color: #666; font-size: 12px;">
+            <p>Este correo fue enviado automáticamente. Por favor no respondas a este mensaje.</p>
+          </div>
+        </body>
+        </html>
+      `,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`Vaccination reminder email sent to ${to}. Message ID: ${info.messageId}`);
+    return info;
+  } catch (error) {
+    console.error(`Error sending vaccination reminder email to ${to}:`, error.message);
+    throw error;
+  }
+};
+
+export const sendDewormingReminderEmail = async (to, clientName, dewormingData) => {
+  try {
+    const { product, parasiteType, nextDose, petName } = dewormingData;
+
+    const mailOptions = {
+      from: `"Vetcore Platform" <${process.env.EMAIL_FROM}>`,
+      to: to,
+      subject: "Recordatorio: Desparasitación próxima a vencer - Vetcore",
+      html: `
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Recordatorio de desparasitación</title>
+        </head>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="background-color: #9C27B0; padding: 20px; text-align: center; border-radius: 10px 10px 0 0;">
+            <h1 style="color: white; margin: 0;">🐛 Recordatorio de Desparasitación</h1>
+          </div>
+
+          <div style="background-color: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
+            <h2 style="color: #9C27B0;">Hola ${clientName},</h2>
+
+            <p>Te recordamos que la siguiente dosis de desparasitación de <strong>${petName}</strong> está próxima a vencer.</p>
+
+            <div style="background-color: #fff; padding: 20px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #9C27B0;">
+              <p style="margin: 8px 0;"><strong>💊 Producto:</strong> ${product}</p>
+              <p style="margin: 8px 0;"><strong>🐛 Tipo:</strong> ${parasiteType}</p>
+              <p style="margin: 8px 0;"><strong>📅 Próxima dosis:</strong> ${nextDose}</p>
+              <p style="margin: 8px 0;"><strong>🐾 Mascota:</strong> ${petName}</p>
+            </div>
+
+            <div style="background-color: #f3e5f5; border-left: 4px solid #9C27B0; padding: 15px; margin: 20px 0;">
+              <p style="margin: 0; font-weight: bold; color: #6a1b9a;">⚠️ Importante:</p>
+              <p style="margin: 10px 0 0 0; color: #6a1b9a;">
+                La desparasitación regular protege a tu mascota de parásitos que pueden afectar su salud. Te recomendamos agendar una cita para aplicar la siguiente dosis.
+              </p>
+            </div>
+
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}"
+                 style="background-color: #9C27B0; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">
+                Agendar cita
+              </a>
+            </div>
+
+            <p>Si ya agendaste la cita, puedes ignorar este mensaje.</p>
+
+            <p style="margin-top: 30px;">
+              <strong>El equipo de Vetcore</strong><br>
+              <small style="color: #666;">Cuidando de tus mascotas con amor y profesionalismo</small>
+            </p>
+          </div>
+
+          <div style="text-align: center; margin-top: 20px; color: #666; font-size: 12px;">
+            <p>Este correo fue enviado automáticamente. Por favor no respondas a este mensaje.</p>
+          </div>
+        </body>
+        </html>
+      `,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`Deworming reminder email sent to ${to}. Message ID: ${info.messageId}`);
+    return info;
+  } catch (error) {
+    console.error(`Error sending deworming reminder email to ${to}:`, error.message);
+    throw error;
+  }
+};
+
+export const sendFollowUpReminderEmail = async (to, clientName, followUpData) => {
+  try {
+    const { nextConsultation, diagnosis, petName } = followUpData;
+
+    const mailOptions = {
+      from: `"Vetcore Platform" <${process.env.EMAIL_FROM}>`,
+      to: to,
+      subject: "Recordatorio: Consulta de seguimiento próxima - Vetcore",
+      html: `
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Recordatorio de seguimiento</title>
+        </head>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="background-color: #00BCD4; padding: 20px; text-align: center; border-radius: 10px 10px 0 0;">
+            <h1 style="color: white; margin: 0;">🏥 Recordatorio de Seguimiento</h1>
+          </div>
+
+          <div style="background-color: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
+            <h2 style="color: #00BCD4;">Hola ${clientName},</h2>
+
+            <p>Te recordamos que se aproxima la fecha de la <strong>consulta de seguimiento</strong> recomendada para <strong>${petName}</strong>.</p>
+
+            <div style="background-color: #fff; padding: 20px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #00BCD4;">
+              <p style="margin: 8px 0;"><strong>📅 Fecha sugerida:</strong> ${nextConsultation}</p>
+              <p style="margin: 8px 0;"><strong>🐾 Mascota:</strong> ${petName}</p>
+              ${diagnosis ? `<p style="margin: 8px 0;"><strong>📋 Diagnóstico previo:</strong> ${diagnosis}</p>` : ''}
+            </div>
+
+            <div style="background-color: #e0f7fa; border-left: 4px solid #00BCD4; padding: 15px; margin: 20px 0;">
+              <p style="margin: 0; font-weight: bold; color: #006064;">⚠️ Importante:</p>
+              <p style="margin: 10px 0 0 0; color: #006064;">
+                El seguimiento médico es fundamental para monitorear la evolución de tu mascota y asegurar su recuperación completa. Te recomendamos agendar una cita.
+              </p>
+            </div>
+
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}"
+                 style="background-color: #00BCD4; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">
+                Agendar cita de seguimiento
+              </a>
+            </div>
+
+            <p>Si ya agendaste la cita o si el veterinario te indicó otra fecha, puedes ignorar este mensaje.</p>
+
+            <p style="margin-top: 30px;">
+              <strong>El equipo de Vetcore</strong><br>
+              <small style="color: #666;">Cuidando de tus mascotas con amor y profesionalismo</small>
+            </p>
+          </div>
+
+          <div style="text-align: center; margin-top: 20px; color: #666; font-size: 12px;">
+            <p>Este correo fue enviado automáticamente. Por favor no respondas a este mensaje.</p>
+          </div>
+        </body>
+        </html>
+      `,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`Follow-up reminder email sent to ${to}. Message ID: ${info.messageId}`);
+    return info;
+  } catch (error) {
+    console.error(`Error sending follow-up reminder email to ${to}:`, error.message);
+    throw error;
+  }
+};

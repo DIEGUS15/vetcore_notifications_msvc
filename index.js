@@ -5,6 +5,12 @@ import { verifyEmailConfig } from "./src/config/mailer.js";
 import { startClientCreatedConsumer } from "./src/events/consumers/clientCreatedConsumer.js";
 import { startUserCreatedByAdminConsumer } from "./src/events/consumers/userCreatedByAdminConsumer.js";
 import { startAppointmentCreatedConsumer } from "./src/events/consumers/appointmentCreatedConsumer.js";
+import {
+  startAppointmentReminderConsumer,
+  startVaccinationReminderConsumer,
+  startDewormingReminderConsumer,
+  startFollowUpReminderConsumer,
+} from "./src/events/consumers/reminderConsumers.js";
 
 dotenv.config();
 
@@ -31,6 +37,10 @@ const startServer = async () => {
     await startClientCreatedConsumer();
     await startUserCreatedByAdminConsumer();
     await startAppointmentCreatedConsumer();
+    await startAppointmentReminderConsumer();
+    await startVaccinationReminderConsumer();
+    await startDewormingReminderConsumer();
+    await startFollowUpReminderConsumer();
 
     app.listen(PORT, () => {
       console.log(`Email Service running on http://localhost:${PORT}`);
